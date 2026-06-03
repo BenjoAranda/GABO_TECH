@@ -575,7 +575,7 @@ footer p::before {
   background: var(--px-bg);
   border: 2px solid var(--px-border);
   color: var(--px-text);
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 0.45rem;
   padding: 10px 12px;
   outline: none;
@@ -611,7 +611,7 @@ footer p::before {
   color: var(--px-bg);
   border: 3px solid var(--px-border);
   box-shadow: 4px 4px 0 var(--px-accent);
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 0.5rem;
   cursor: pointer;
   text-transform: uppercase;
@@ -696,7 +696,9 @@ footer p::before {
   flex-wrap: wrap;
 }
 
-.cart-item-info { flex: 1; }
+.cart-item-info {
+  flex: 1;
+}
 
 .cart-item-name {
   font-size: 0.5rem;
@@ -722,7 +724,7 @@ footer p::before {
   background: var(--px-bg);
   border: 2px solid var(--px-border);
   color: var(--px-text);
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 0.7rem;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--px-border);
@@ -796,7 +798,7 @@ footer p::before {
   color: var(--px-bg);
   border: 3px solid var(--px-green);
   box-shadow: 4px 4px 0 var(--px-border2);
-  font-family: 'Press Start 2P', monospace;
+  font-family: "Press Start 2P", monospace;
   font-size: 0.5rem;
   cursor: pointer;
   text-transform: uppercase;
@@ -812,9 +814,15 @@ footer p::before {
 
 /* Animación bump del contador */
 @keyframes bump {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.4); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .bump {
@@ -851,4 +859,73 @@ footer p::before {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+/* ── Estado carga / error productos ── */
+.products-loading,
+.products-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--px-text-dim);
+}
+
+.products-loading p,
+.products-error p {
+  font-size: 0.5rem;
+  margin-top: 12px;
+  color: var(--px-text-dim);
+}
+
+.loading-icon {
+  font-size: 2rem;
+  display: block;
+  animation: blink 0.8s steps(1) infinite;
+}
+
+.products-error span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* ── Contador de cantidad en producto ── */
+.product-qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 8px;
+}
+
+.product-qty-btn {
+  width: 30px;
+  height: 30px;
+  background: var(--px-bg);
+  border: 2px solid var(--px-border);
+  color: var(--px-text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--px-border);
+  transition: none;
+  line-height: 1;
+}
+
+.product-qty-btn:hover {
+  background: var(--px-border);
+  color: var(--px-bg);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.product-qty-value {
+  font-size: 0.65rem;
+  color: var(--px-accent);
+  min-width: 28px;
+  text-align: center;
+  background: var(--px-bg);
+  border: 2px solid var(--px-accent);
+  padding: 4px 6px;
+  display: inline-block;
 }

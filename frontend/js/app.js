@@ -11,17 +11,14 @@ enlaces.forEach(function (enlace) {
 
     const vista = enlace.dataset.view;
 
-    // Ocultar todas las vistas
     document.querySelectorAll(".view").forEach(function (seccion) {
       seccion.classList.remove("active");
     });
 
-    // Quitar activo de todos los links
     enlaces.forEach(function (link) {
       link.classList.remove("active");
     });
 
-    // Mostrar la vista seleccionada y marcar link activo
     document.getElementById("view-" + vista).classList.add("active");
     enlace.classList.add("active");
   });
@@ -47,7 +44,7 @@ const productos = [
     id: 3,
     nombre: "Protectores",
     descripcion: "Protectores definidos y a su personalizacion",
-    precio: 60,
+    precio: 50,
     imagen: "img/protectores.png",
   },
   {
@@ -114,9 +111,8 @@ function actualizarContador() {
   const total = carrito.reduce((acc, p) => acc + p.cantidad, 0);
   contador.textContent = total;
 
-  // Animación "bump"
   contador.classList.remove("bump");
-  void contador.offsetWidth; // fuerza reflow para reiniciar la animación
+  void contador.offsetWidth;
   contador.classList.add("bump");
   setTimeout(() => contador.classList.remove("bump"), 300);
 }
@@ -136,36 +132,64 @@ function renderizarProductos() {
             class="product-img"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
           />
-          <div class="product-img-placeholder">
-            <span>📦</span>
-          </div>
+          <div class="product-img-placeholder"><span>📦</span></div>
         </div>
         <h3>${producto.nombre}</h3>
         <p>${producto.descripcion}</p>
         <span class="product-price">Bs. ${producto.precio}</span>
+
+        <div class="product-qty-controls">
+          <button class="product-qty-btn" data-id="${producto.id}" data-action="decrease">−</button>
+          <span class="product-qty-value" id="qty-${producto.id}">1</span>
+          <button class="product-qty-btn" data-id="${producto.id}" data-action="increase">+</button>
+        </div>
+
         <button class="btn-add" data-id="${producto.id}">+ Agregar</button>
       </div>
     `;
   });
 
-  // Eventos de los botones
+  // Eventos contador +/−
+  document.querySelectorAll(".product-qty-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const id = parseInt(this.dataset.id);
+      const accion = this.dataset.action;
+      const display = document.getElementById("qty-" + id);
+      let cantidad = parseInt(display.textContent);
+
+      if (accion === "increase") {
+        cantidad += 1;
+      } else if (accion === "decrease" && cantidad > 1) {
+        cantidad -= 1;
+      }
+
+      display.textContent = cantidad;
+    });
+  });
+
+  // Eventos botón Agregar
   document.querySelectorAll(".btn-add").forEach(function (boton) {
     boton.addEventListener("click", function () {
       const id = parseInt(this.dataset.id);
       const producto = productos.find((p) => p.id === id);
+      const cantidad = parseInt(
+        document.getElementById("qty-" + id).textContent,
+      );
       const existente = carrito.find((p) => p.id === id);
 
       if (existente) {
-        existente.cantidad += 1;
+        existente.cantidad += cantidad;
       } else {
-        carrito.push({ ...producto, cantidad: 1 });
+        carrito.push({ ...producto, cantidad });
       }
+
+      // Resetear contador a 1
+      document.getElementById("qty-" + id).textContent = 1;
 
       guardarCarrito();
       actualizarContador();
       renderizarCarrito();
 
-      // Feedback visual
       this.textContent = "✔ Agregado";
       const btn = this;
       setTimeout(() => {
@@ -191,7 +215,6 @@ function renderizarCarrito() {
     return;
   }
 
-  // Renderizar cada item
   carrito.forEach(function (producto) {
     contenedor.innerHTML += `
       <div class="cart-item">
@@ -211,7 +234,6 @@ function renderizarCarrito() {
     `;
   });
 
-  // Total general
   const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
 
   contenedor.innerHTML += `
@@ -234,7 +256,6 @@ function renderizarCarrito() {
     </div>
   `;
 
-  // Eventos botones + y −
   contenedor.querySelectorAll(".qty-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
       const id = parseInt(this.dataset.id);
@@ -276,7 +297,6 @@ function inicializarFormularioContacto() {
     const errorMensaje = document.getElementById("error-message");
     const exito = document.getElementById("form-success");
 
-    // Limpiar errores previos
     [errorNombre, errorEmail, errorMensaje].forEach(
       (el) => (el.textContent = ""),
     );
@@ -315,9 +335,63 @@ function inicializarFormularioContacto() {
     form.reset();
   });
 }
+//js.app.js
+async function confirmarPedido() {
+  //1. Verificar sesion activa
+  const {
+    data: { user },
+  } = await db.auth.getUser();
+  if (!user) {
+    mostrarMensaje("Debes iniciar sesion primero", "error");
+    navegarA("login");
+    return;
+  }
+  if (carrito.length === 0) {
+    mostrarMensaje("El carrito esta vacio", "error");
+    return;
+  }
+
+  //2. Calcular total
+  const total = carrito.reduce(
+    (acc, item) => acc + item.precio * item.cantidad,
+    0,
+  );
+  //3. Insertar en orders
+  const { data: pedido, error: el } = await db
+    .from("orders")
+    .insert({
+      user_id: user.id,
+      total: parseFloat(total.toFixed(2)),
+      estado: "pending",
+    })
+    .select()
+    .single();
+  if (el) {
+    mostrarMensaje(el.message, "error");
+  }
+  //4. Insertar Items
+  const items = carrito.map((item) => ({
+    order_id: pedido.id,
+    product_id: item.id,
+    cantidad: item.cantidad,
+    precio_unit: item.precio,
+  }));
+  const { error: e2 } = await db.from("order_items").insert(items);
+  if (e2) {
+    mostrarMensaje(e2.message, "error");
+    return;
+  }
+  //5.Limpiar carrito y confirmar
+  carrito = [];
+  guardarCarrito();
+  actualizarContador();
+  renderizarCarrito();
+  mostrarMensaje("Pedido #" + pedido.id + " confirmado!", "exito");
+}
 
 // ── INIT ────────────────────────────────────
 cargarCarrito();
 renderizarProductos();
 renderizarCarrito();
 actualizarContador();
+inicializarFormularioContacto();
