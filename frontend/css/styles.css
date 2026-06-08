@@ -929,3 +929,155 @@ footer p::before {
   padding: 4px 6px;
   display: inline-block;
 }
+
+/* =============================================
+   AUTH - BOTONES NAVBAR
+   ============================================= */
+.nav-auth,
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-auth {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.45rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  border: 2px solid;
+  text-transform: uppercase;
+  transition: none;
+}
+
+.btn-login {
+  background: var(--px-bg2);
+  color: var(--px-border);
+  border-color: var(--px-border);
+  box-shadow: 2px 2px 0 var(--px-border);
+}
+
+.btn-login:hover {
+  background: var(--px-border);
+  color: var(--px-bg);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.btn-register {
+  background: var(--px-accent);
+  color: var(--px-bg);
+  border-color: var(--px-accent);
+  box-shadow: 2px 2px 0 var(--px-border2);
+}
+
+.btn-register:hover {
+  background: var(--px-bg);
+  color: var(--px-accent);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.btn-logout {
+  background: var(--px-bg2);
+  color: var(--px-pink);
+  border-color: var(--px-pink);
+  box-shadow: 2px 2px 0 var(--px-pink);
+}
+
+.btn-logout:hover {
+  background: var(--px-pink);
+  color: var(--px-white);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.nav-username {
+  font-size: 0.45rem;
+  color: var(--px-green);
+  letter-spacing: 1px;
+}
+
+/* =============================================
+   AUTH - MODALES
+   ============================================= */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--px-panel);
+  border: 3px solid var(--px-border);
+  box-shadow: 8px 8px 0 var(--px-border);
+  padding: 32px 28px;
+  width: 90%;
+  max-width: 420px;
+  position: relative;
+  animation: pixelIn 0.2s steps(4) forwards;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: 2px solid var(--px-pink);
+  color: var(--px-pink);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: var(--px-pink);
+  color: var(--px-white);
+}
+
+.modal-title {
+  font-size: 0.7rem;
+  color: var(--px-accent);
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.modal-switch {
+  font-size: 0.4rem;
+  color: var(--px-text-dim);
+  text-align: center;
+  margin-top: 16px;
+}
+
+.modal-switch a {
+  color: var(--px-border);
+  text-decoration: none;
+}
+
+.modal-switch a:hover {
+  color: var(--px-accent);
+}
+
+/* Responsive navbar con auth */
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-auth,
+  .nav-user {
+    width: 100%;
+    justify-content: center;
+  }
+}

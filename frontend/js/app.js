@@ -389,9 +389,151 @@ async function confirmarPedido() {
   mostrarMensaje("Pedido #" + pedido.id + " confirmado!", "exito");
 }
 
+// ── AUTENTICACIÓN - MODALES ──────────────────
+function inicializarAuth() {
+  const modalLogin    = document.getElementById("modal-login");
+  const modalRegister = document.getElementById("modal-register");
+
+  // Abrir modales
+  document.getElementById("btn-open-login").addEventListener("click", () => {
+    modalLogin.classList.add("open");
+  });
+  document.getElementById("btn-open-register").addEventListener("click", () => {
+    modalRegister.classList.add("open");
+  });
+
+  // Cerrar modales
+  document.getElementById("close-login").addEventListener("click", () => {
+    modalLogin.classList.remove("open");
+  });
+  document.getElementById("close-register").addEventListener("click", () => {
+    modalRegister.classList.remove("open");
+  });
+
+  // Cerrar al hacer clic fuera
+  [modalLogin, modalRegister].forEach(modal => {
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+  });
+
+  // Cambiar entre modales
+  document.getElementById("switch-to-register").addEventListener("click", (e) => {
+    e.preventDefault();
+    modalLogin.classList.remove("open");
+    modalRegister.classList.add("open");
+  });
+  document.getElementById("switch-to-login").addEventListener("click", (e) => {
+    e.preventDefault();
+    modalRegister.classList.remove("open");
+    modalLogin.classList.add("open");
+  });
+
+  // ── SUBMIT LOGIN ──
+  document.getElementById("form-login").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const email    = document.getElementById("login-email");
+    const password = document.getElementById("login-password");
+    const msgEmail = document.getElementById("error-login-email");
+    const msgPass  = document.getElementById("error-login-password");
+    const msgOk    = document.getElementById("login-success");
+
+    msgEmail.textContent = "";
+    msgPass.textContent  = "";
+    msgOk.textContent    = "";
+
+    let valido = true;
+    if (!email.value.trim()) {
+      msgEmail.textContent = "Email obligatorio";
+      valido = false;
+    }
+    if (!password.value.trim()) {
+      msgPass.textContent = "Contraseña obligatoria";
+      valido = false;
+    }
+    if (!valido) return;
+
+    const resultado = await iniciarSesion(email.value.trim(), password.value.trim());
+
+    if (!resultado.ok) {
+      msgEmail.textContent = resultado.error;
+      return;
+    }
+
+    msgOk.textContent = "✔ Bienvenido, " + (resultado.nombre || "usuario");
+    actualizarNavbar(resultado);
+    setTimeout(() => modalLogin.classList.remove("open"), 1200);
+    this.reset();
+  });
+
+  // ── SUBMIT REGISTRO ──
+  document.getElementById("form-register").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const nombre   = document.getElementById("register-name");
+    const email    = document.getElementById("register-email");
+    const password = document.getElementById("register-password");
+    const msgNombre = document.getElementById("error-register-name");
+    const msgEmail  = document.getElementById("error-register-email");
+    const msgPass   = document.getElementById("error-register-password");
+    const msgOk     = document.getElementById("register-success");
+
+    [msgNombre, msgEmail, msgPass].forEach(el => el.textContent = "");
+    msgOk.textContent = "";
+
+    let valido = true;
+    if (!nombre.value.trim())   { msgNombre.textContent = "Nombre obligatorio";     valido = false; }
+    if (!email.value.trim())    { msgEmail.textContent  = "Email obligatorio";      valido = false; }
+    if (!password.value.trim()) { msgPass.textContent   = "Contraseña obligatoria"; valido = false; }
+    if (!valido) return;
+
+    const resultado = await registrarUsuario(
+      nombre.value.trim(),
+      email.value.trim(),
+      password.value.trim()
+    );
+
+    if (!resultado.ok) {
+      msgEmail.textContent = resultado.error;
+      return;
+    }
+
+    msgOk.textContent = "✔ Cuenta creada. Revisa tu email para confirmar.";
+    this.reset();
+  });
+
+  // ── LOGOUT ──
+  document.getElementById("btn-logout").addEventListener("click", async () => {
+    await cerrarSesion();
+  });
+
+  // Verificar si ya hay sesión activa al cargar
+  obtenerUsuarioActual().then(usuario => {
+    if (usuario) actualizarNavbar(usuario);
+  });
+}
+
+// ── ACTUALIZAR NAVBAR SEGÚN SESIÓN ──────────
+function actualizarNavbar(usuario) {
+  const navAuth = document.getElementById("nav-auth");
+  const navUser = document.getElementById("nav-user");
+  const navUsername = document.getElementById("nav-username");
+
+  if (usuario) {
+    navAuth.style.display = "none";
+    navUser.style.display = "flex";
+    navUsername.textContent = "▶ " + (usuario.nombre || usuario.email);
+  } else {
+    navAuth.style.display = "flex";
+    navUser.style.display = "none";
+  }
+}
+
 // ── INIT ────────────────────────────────────
 cargarCarrito();
 renderizarProductos();
 renderizarCarrito();
 actualizarContador();
 inicializarFormularioContacto();
+inicializarAuth();
