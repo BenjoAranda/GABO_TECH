@@ -85,6 +85,24 @@ const productos = [
     precio: 200,
     imagen: "img/audifonos_inalambricos.png",
   },
+  {
+    id: 11,
+    nombre: "Cargadores Portatiles",
+    categoria: "accesorios",
+    descripcion:
+      "Cargadores practicos y compactos para tu celular en donde sea",
+    precio: 80,
+    imagen: "img/cargadores_portatiles.png",
+  },
+  {
+    id: 12,
+    nombre: "Relojes Inteligentes",
+    categoria: "accesorios",
+    descripcion:
+      "Relojes para ver notificaciones y monitorear tus actividades diarias",
+    precio: 260,
+    imagen: "img/relojes_inteligentes.png",
+  },
   // REPUESTOS
   {
     id: 4,
@@ -101,6 +119,22 @@ const productos = [
     descripcion: "Pantallas Originales de marca Samsung y Apple",
     precio: 150,
     imagen: "img/pantallas.png",
+  },
+  {
+    id: 13,
+    nombre: "Camaras",
+    categoria: "repuestos",
+    descripcion: "Camaras Originales todos los modelos",
+    precio: 50,
+    imagen: "img/camaras_repuestos.png",
+  },
+  {
+    id: 14,
+    nombre: "Cambio de puerto de carga",
+    categoria: "repuestos",
+    descripcion: "Limpieza o remplazo del puerto de carga",
+    precio: 30,
+    imagen: "img/puertos_carga.png",
   },
 ];
 
