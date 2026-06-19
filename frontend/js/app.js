@@ -276,6 +276,13 @@ function inicializarFormularioContacto() {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
+    // Bloquear si no hay sesión
+    if (!usuarioActual) {
+      document.getElementById("btn-open-login").click();
+      mostrarAlertaContacto();
+      return;
+    }
+
     const nombre  = document.getElementById("contact-name");
     const email   = document.getElementById("contact-email");
     const mensaje = document.getElementById("contact-message");
@@ -462,12 +469,48 @@ function actualizarNavbar(usuario) {
     navUser.style.display = "flex";
     navUsername.textContent = "▶ " + (usuario.nombre || usuario.email);
     renderizarProductos();
+    inicializarLinksContacto();
   } else {
     usuarioActual = null;
     navAuth.style.display = "flex";
     navUser.style.display = "none";
     renderizarProductos();
+    inicializarLinksContacto();
   }
+}
+
+// ── BLOQUEO LINKS DE CONTACTO ───────────────
+function inicializarLinksContacto() {
+  const links = [
+    document.getElementById("link-maps"),
+    document.getElementById("link-whatsapp"),
+  ];
+
+  links.forEach(function (link) {
+    if (!link) return;
+    link.addEventListener("click", function (e) {
+      if (!usuarioActual) {
+        e.preventDefault();
+        document.getElementById("btn-open-login").click();
+        mostrarAlertaContacto();
+      }
+    });
+  });
+}
+
+function mostrarAlertaContacto() {
+  const previa = document.getElementById("alerta-contacto");
+  if (previa) previa.remove();
+
+  const alerta = document.createElement("div");
+  alerta.id = "alerta-contacto";
+  alerta.className = "alerta-login";
+  alerta.innerHTML = `
+    <span>⚠️ Debes iniciar sesión para acceder a esta información.</span>
+    <button onclick="document.getElementById('alerta-contacto').remove()">✕</button>
+  `;
+  document.querySelector("#view-contact").prepend(alerta);
+  setTimeout(() => { if (alerta.parentNode) alerta.remove(); }, 3500);
 }
 
 // ── INIT ────────────────────────────────────
@@ -476,4 +519,5 @@ renderizarProductos();
 renderizarCarrito();
 actualizarContador();
 inicializarFormularioContacto();
+inicializarLinksContacto();
 inicializarAuth();
