@@ -261,11 +261,29 @@ async function confirmarPedido() {
   const { error: e2 } = await db.from("order_items").insert(items);
   if (e2) { alert("Error al guardar los items: " + e2.message); return; }
 
+  // Armar mensaje de WhatsApp con el resumen del pedido
+  const nombreUsuario = usuarioActual ? (usuarioActual.nombre || usuarioActual.email) : "Cliente";
+  const lineasProductos = items.map((item) => {
+    const producto = productos.find((p) => p.id === item.product_id);
+    const nombre   = producto ? producto.nombre : "Producto";
+    return `• ${nombre} x${item.cantidad} — Bs. ${(item.precio_unit * item.cantidad).toFixed(2)}`;
+  }).join("\n");
+
+  const mensajeWA =
+    `🛍️ *NUEVO PEDIDO #${pedido.id}*\n\n` +
+    `👤 *Cliente:* ${nombreUsuario}\n\n` +
+    `📦 *Productos:*\n${lineasProductos}\n\n` +
+    `💰 *Total: Bs. ${total.toFixed(2)}*\n\n` +
+    `Por favor, confirmar disponibilidad. ¡Gracias!`;
+
   carrito = [];
   guardarCarrito();
   actualizarContador();
   renderizarCarrito();
-  alert("¡Pedido #" + pedido.id + " confirmado! Gracias por tu compra 🎉");
+  alert("¡Pedido #" + pedido.id + " confirmado! Gracias por tu compra 🎉\nSe abrirá WhatsApp para enviar el resumen.");
+
+  const urlWA = `https://wa.me/59169525932?text=${encodeURIComponent(mensajeWA)}`;
+  window.open(urlWA, "_blank");
 }
 
 // ── FORMULARIO DE CONTACTO ──────────────────
